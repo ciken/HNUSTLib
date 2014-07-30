@@ -1,0 +1,39 @@
+#!/usr/bin/python2
+#-*- coding:utf8 -*- 
+import sys
+from datetime import date
+
+TODAY = date.today()
+
+reload(sys); sys.setdefaultencoding('GB18030')	#set coding
+
+RENEW_BOOK_EXPIRED_TIME = 7
+#set workspace dir
+WORKSPACE_DIR = '/var/www/lib/'
+LOG_DIR = WORKSPACE_DIR + 'logs/'
+#URL set
+LIB_URL = 'http://211.67.223.8:8080/'
+LIB_LOGIN_URL =['reader/login.jsp?str_kind=login&barcode=&fangshi=1&identification_id=', '&password=']
+LIB_BORROW_INFO_URL = 'http://211.67.223.8:8080/reader/infoList.jsp'
+
+#Mail set
+MAIL_HOST = 'smtp.qq.com'
+MAIL_USER = ''
+MAIL_PWD  = ''
+MAIL_POSTFIX = 'qq.com'
+FROM_MAIL = MAIL_USER + "<"+MAIL_USER+"@"+MAIL_POSTFIX+">"
+MSG_SUBJECT = '湖南科技大学图书馆自动续借系统'
+
+#db set
+DB_HOST = 'localhost'
+DB_PORT = '3306'
+DB_USER = 'root'
+DB_PASSWD = ''
+DB_NAME = 'hnuster'
+
+#logging model set
+LOG_CONTENT_FORMAT='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'
+LOG_DATE_FROAMTE='%a, %d %b %Y %H:%M:%S'
+LOG_RENEW_FILE_NAME='%srenew/%s.log'%(LOG_DIR, str(TODAY))
+LOG_DJANGO_FILE_NAME='%sdjango/%s.log'%(LOG_DIR, str(TODAY))
+LOG_FILE_MODE='a+'
