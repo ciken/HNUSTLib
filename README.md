@@ -31,6 +31,8 @@ E-mail: ciken@live.cn  <br />
 	├── logs				#日志文件夹
 	│   └── renew
 	│       └── 2014-07-30.logs 		#日志文件，以日期为文件名
+	├── json				#续借信息
+	│   └── *.json
 	└── README.md 			#README
 
 
@@ -53,7 +55,11 @@ E-mail: ciken@live.cn  <br />
 
 ####update information
 
-下次更新：用户借阅信息使用json进行交互
+version:1.4 <br />
+1.使用json进行内容交互
+2.发送邮件成功记录进log
+2014.07.30 <br />
+ <br />
 
 version:1.3 <br />
 1.使用mysql作为数据库对用户信息进行存取 <br />

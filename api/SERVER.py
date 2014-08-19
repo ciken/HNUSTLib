@@ -45,9 +45,10 @@ def sendEmail(stu_id, stu_mail, msg_content):
 		MAIL.login(CONF.MAIL_USER,CONF.MAIL_PWD)
 		MAIL.sendmail(CONF.FROM_MAIL, TO_MAIL, MSG.as_string())
 		MAIL.close()
+		logging.info('%s ,send Email to %s successed.'%(stu_id, stu_mail))
 		return True
 	except Exception,e:
-		logging.error('%s , %s has no send Email because : %s'%(stu_id, stu_mail, e))
+		logging.error('%s , has no send Email to %s because : %s'%(stu_id, stu_mail, e))
 		return False
 
 logging.basicConfig(
