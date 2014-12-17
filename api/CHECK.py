@@ -8,18 +8,21 @@ lib = requests.session()
 def calcDate(Date):
 	return (CONF.date(int(Date[0]), int(Date[1]), int(Date[2])) - CONF.TODAY).days
 
-def collectReaderBorrowContent(stu_id, stu_passwd, stu_mail):
+def checkReaderPasswd(stu_id, stu_passwd ):
 	lib_request_url = CONF.LIB_URL + CONF.LIB_LOGIN_URL[0] + stu_id + CONF.LIB_LOGIN_URL[1] +stu_passwd
 	lib_request_return_content = lib.get(lib_request_url).text
 	if 'alert' in lib_request_return_content:
 		return re.search(r'(?<=alert.").+?(?=")', lib_request_return_content).group(0).encode('utf-8')
 	else:
-		from bs4 import BeautifulSoup
-		#获取数据并提取信息
-		borrow_html_content = lib.get(CONF.LIB_BORROW_INFO_URL).text
-		borrow_content = BeautifulSoup(borrow_html_content).find(attrs={"cellpadding":"2"})
-		#return borrow_table
-		return borrow_content
+		return False
+
+def collectReaderBorrowContent(stu_id, stu_passwd ):
+	from bs4 import BeautifulSoup
+	#获取数据并提取信息
+	borrow_html_content = lib.get(CONF.LIB_BORROW_INFO_URL).text
+	borrow_content = BeautifulSoup(borrow_html_content).find(attrs={"cellpadding":"2"})
+	#return borrow_table
+	return borrow_content
 		
 	
 def getBorrowInfo(stu_id, borrow_content):

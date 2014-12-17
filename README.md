@@ -41,6 +41,7 @@ E-mail: ciken@live.cn  <br />
 	CHECK.py
 	├── calcDate		#计算还剩多少天还书
 	├──	getBorrowInfo 	#以list[dict]格式返回读者借阅信息
+	├── checkReaderPasswd #获取登入返回信息
 	├──	renewBook		#接受list[dict]格式的参数，以list[dict]格式返回续借信息，并更新还书期限
 	└──	mailContentHand #邮件处理，接受字符串格式的学号、list[dict]格式的续借信息、list[dict]格式的借阅信息，返回字符串格式html形式的邮件内容
 
@@ -54,10 +55,14 @@ E-mail: ciken@live.cn  <br />
 
 
 ####update information
-
+version:1.4.1<br />
+1.将获取登入信息函数提取出来 <br />
+2.密码错误数据库续借开关关闭并发送邮件给读者 <br />
+2014.12.17 <br />
+ <br />
 version:1.4 <br />
-1.使用json进行内容交互
-2.发送邮件成功记录进log
+1.使用json进行内容交互 <br />
+2.发送邮件成功记录进log <br />
 2014.07.30 <br />
  <br />
 
