@@ -1,9 +1,18 @@
 #!/usr/bin/python2
 # -*- coding:utf-8 -*-
-import requests,re, json, codecs
+import requests,re
 import CONF
 
-lib = requests.session()
+def libConnect():
+	try:
+		global lib
+		lib = requests.session()
+		#test connec to lib
+		lib.get(CONF.LIB_URL + CONF.LIB_LOGIN_URL[0])
+		return False
+
+	except Exception,e:
+		return e
 
 def calcDate(Date):
 	return (CONF.date(int(Date[0]), int(Date[1]), int(Date[2])) - CONF.TODAY).days
@@ -21,7 +30,6 @@ def collectReaderBorrowContent(stu_id, stu_passwd ):
 	#获取数据并提取信息
 	borrow_html_content = lib.get(CONF.LIB_BORROW_INFO_URL).text
 	borrow_content = BeautifulSoup(borrow_html_content).find(attrs={"cellpadding":"2"})
-	#return borrow_table
 	return borrow_content
 		
 	
@@ -48,31 +56,37 @@ def getBorrowInfo(stu_id, borrow_content):
 				table[i/5]['library_id']=deepcopy(temp[2])
 				table[i/5]['expire'] = calcDate(table[i/5]['deadline'].split('/'))
 			i+=1;
-	# return table 	#table type is list[dict]
-	json.dump(table , codecs.open("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id),"w+",encoding='utf-8'),indent=2,ensure_ascii =False)
-			
-def renewBook(stu_id):
-	lib_table=json.load(file("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id))); is_renew = False
-	for book in lib_table:
-		if abs(int(book['expire'])) < CONF.RENEW_BOOK_EXPIRED_TIME :
-		# if book['seq'] == 4:
-			post_data = {'action':'Renew', 'book_barcode':book['barcode'], 'department_id':book['department_id'], 'library_id':book['library_id'],};
-			#for instance : {'action': 'Renew', 'library_id': 'A', 'book_barcode': 'KD00871425', 'department_id': 'TP'}
-			lib_renew_return_content = (re.search(r'(?<=alert..).+(?=")', lib.post(CONF.LIB_BORROW_INFO_URL, post_data).text)).group(0)
-			# lib_renew_return_content = u'续借成功!(续借天数30天)共计30天, 应还日期: 2014/08/27'
-			if u'续借成功' in lib_renew_return_content :
-			#if renew success update this book borrow_table deadline and expire, deadline and expire don't need return to main function it will be change
-				book['deadline'] = (re.search(r'\d{4}/\d{2}/\d{2}', lib_renew_return_content)).group(0)
-				book['expire'] = int((re.search(u'(?<=共计).+?(?=天)', lib_renew_return_content)).group(0))
-			book['renrw_return_info']=lib_renew_return_content
-			is_renew=True
-	# return renew_return_content
-	if is_renew:
-		json.dump(lib_table , codecs.open("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id), "w+", encoding='utf-8'), indent=2, ensure_ascii =False)
-		return True
+	return table 	#table type is list[dict]
 
-def mailContentHand(stu_id):
-	lib_table=json.load(file("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id)))
+def renewStu(stu_id, borrow_table):
+	# borrow_table=json.load(file("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id)))
+	try_renew = False
+	for book in borrow_table:
+		if abs(int(book['expire'])) < CONF.RENEW_BOOK_EXPIRED_TIME :
+			renew_info = renewBook(book['barcode'], book['department_id'], book['library_id'])
+			if renew_info['book_deadline'] :
+				book['deadline'] = renew_info['book_deadline']
+				book['expire'] = renew_info['book_expire']
+			book['renrw_return_info'] = renew_info['lib_renew_return_content']
+			try_renew=True
+	# return renew_return_content
+	if try_renew:
+		return borrow_table
+	else :
+		return False
+
+def renewBook(book_barcode, department_id, library_id):
+	book_deadline = ''; book_expire = '',
+	post_data = {'action':'Renew', 'book_barcode':book_barcode, 'department_id':department_id, 'library_id':library_id,}
+	lib_renew_return_content = (re.search(r'(?<=alert..).+(?=")', lib.post(CONF.LIB_BORROW_INFO_URL, post_data).text)).group(0)
+	if u'续借成功' in lib_renew_return_content :
+		book_deadline  = (re.search(r'\d{4}/\d{2}/\d{2}', lib_renew_return_content)).group(0)
+		book_expire = int((re.search(u'(?<=共计).+?(?=天)', lib_renew_return_content)).group(0))
+		print book_expire,book_deadline
+	return {'lib_renew_return_content':lib_renew_return_content, 'book_deadline':book_deadline, 'book_expire':book_expire}
+
+def mailContentHand(stu_id, borrow_table):
+	# lib_table=json.load(file("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id)))
 	mail_content="<br><br><table border='1'> \
 	<tr align='center'><th colspan='3'>图书续借情况 (距应还日期 %d 天自动续借)</th></tr>\
 	<tr align='center'>\
@@ -81,7 +95,7 @@ def mailContentHand(stu_id):
 		<th>续借情况</th>\
 	</tr>\
 	"%(CONF.RENEW_BOOK_EXPIRED_TIME)
-	for renew_info_temp in lib_table:
+	for renew_info_temp in borrow_table:
 		if not renew_info_temp['renrw_return_info'] :
 			continue
 		if u'续借失败' in renew_info_temp['renrw_return_info'] :
@@ -103,7 +117,7 @@ def mailContentHand(stu_id):
 		<th>剩（天）</th>\
 	</tr>\
 	"%(stu_id)
-	for table_temp in lib_table:
+	for table_temp in borrow_table:
 		# print  book['barcode'], book['name'], book['deadline'], book['expire']
 		if int(table_temp['expire']) < 0 :
 			style_color = 'style="color:red"'

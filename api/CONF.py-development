@@ -17,6 +17,7 @@ LIB_LOGIN_URL =['reader/login.jsp?str_kind=login&barcode=&fangshi=1&identificati
 LIB_BORROW_INFO_URL = 'http://211.67.223.8:8080/reader/infoList.jsp'
 
 #Mail set
+ADMIN_MAIL = ''
 MAIL_HOST = 'smtp.qq.com'
 MAIL_USER = ''
 MAIL_PWD  = ''
@@ -34,6 +35,5 @@ DB_NAME = 'hnuster'
 #logging model set
 LOG_CONTENT_FORMAT='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'
 LOG_DATE_FROAMTE='%a, %d %b %Y %H:%M:%S'
-LOG_RENEW_FILE_NAME='%srenew/%s.log'%(LOG_DIR, str(TODAY))
-LOG_DJANGO_FILE_NAME='%sdjango/%s.log'%(LOG_DIR, str(TODAY))
+LOG_RENEW_FILE_NAME='%s%s.log'%(LOG_DIR, str(TODAY))
 LOG_FILE_MODE='a+'

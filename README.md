@@ -39,22 +39,34 @@ E-mail: ciken@live.cn  <br />
 
 #### 各模块函数说明
 	CHECK.py
+	├── libConnect		#测试图书馆链接是否正常
 	├── calcDate		#计算还剩多少天还书
-	├──	getBorrowInfo 	#以list[dict]格式返回读者借阅信息
-	├── checkReaderPasswd #获取登入返回信息
-	├──	renewBook		#接受list[dict]格式的参数，以list[dict]格式返回续借信息，并更新还书期限
-	└──	mailContentHand #邮件处理，接受字符串格式的学号、list[dict]格式的续借信息、list[dict]格式的借阅信息，返回字符串格式html形式的邮件内容
+	├── checkReaderPasswd	#检查读者密码是否正确
+	├── collectReaderBorrowContent	#检查读者是否借书,没有的话返回False,有的话提取借书段字符串
+	├── getBorrowInfo 	#以list[dict]格式返回读者借阅信息
+	├── renewStu	#为该学号检查并尝试续借
+	├── renewBook		#续借某书,接受list[dict]格式的参数，以list[dict]格式返回续借信息，并更新还书期限
+	└── mailContentHand #邮件处理，接受字符串格式的学号、list[dict]格式的续借信息、list[dict]格式的借阅信息，返回字符串格式html形式的邮件内容
 
 	SERVER.py
 	├──	db			#数据库操作，相关接口待用。接受字符串（'GET'、'ADD'、'DEL'、'SWITCH'）格式、字符串（'GET'接收None参数、'ADD' 接收3个参数、'DEL'接收1个参数、'SWITCH'接受2个参数）
 	└──	sendEmail	#发送邮件函数，接收字符串格式的（学号、邮件地址、邮件内容）
 
-	master.py
+	renew_master.py
+	├── libConnectTest	#测试 图书馆连接是否正常
+	├── stuLibSecretFalseHand 	#密码失败处理
+	├── stuLibSecretTrueHand	#密码成功处理
 	└──各模块函数调用、日志记录相关
 
 
 
 ####update information
+version:1.4.2<br />
+1.添加CHECK.collectReaderBorrowContent模块，连接不成功发送邮件并退出<br />
+2.将CHECK.renewStu、CHECK.renewStu从CHECK.renewBook函数中分离出来<br />
+3.改回各函数中返回方式为python字典，最后json写入文件<br />
+4.将renew_master中各函数分离出来<br />
+
 version:1.4.1<br />
 1.将获取登入信息函数提取出来 <br />
 2.密码错误数据库续借开关关闭并发送邮件给读者 <br />
