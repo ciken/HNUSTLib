@@ -61,6 +61,9 @@ E-mail: ciken@live.cn  <br />
 
 
 ####update information
+version:1.4.2.1<br />
+1.修改CHECK.renewBook的返回形式
+
 version:1.4.2<br />
 1.添加CHECK.collectReaderBorrowContent模块，连接不成功发送邮件并退出<br />
 2.将CHECK.renewStu、CHECK.renewStu从CHECK.renewBook函数中分离出来<br />

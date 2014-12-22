@@ -64,7 +64,7 @@ def renewStu(stu_id, borrow_table):
 	for book in borrow_table:
 		if abs(int(book['expire'])) < CONF.RENEW_BOOK_EXPIRED_TIME :
 			renew_info = renewBook(book['barcode'], book['department_id'], book['library_id'])
-			if renew_info['book_deadline'] :
+			if renew_info['renew_success'] :
 				book['deadline'] = renew_info['book_deadline']
 				book['expire'] = renew_info['book_expire']
 			book['renrw_return_info'] = renew_info['lib_renew_return_content']
@@ -83,7 +83,9 @@ def renewBook(book_barcode, department_id, library_id):
 		book_deadline  = (re.search(r'\d{4}/\d{2}/\d{2}', lib_renew_return_content)).group(0)
 		book_expire = int((re.search(u'(?<=共计).+?(?=天)', lib_renew_return_content)).group(0))
 		print book_expire,book_deadline
-	return {'lib_renew_return_content':lib_renew_return_content, 'book_deadline':book_deadline, 'book_expire':book_expire}
+		return {'renew_success':True,'lib_renew_return_content':lib_renew_return_content, 'book_deadline':book_deadline, 'book_expire':book_expire}
+	else :
+		return {'renew_success':False, 'lib_renew_return_content':lib_renew_return_content, }
 
 def mailContentHand(stu_id, borrow_table):
 	# lib_table=json.load(file("%s/json/%s.json"%(CONF.WORKSPACE_DIR, stu_id)))
